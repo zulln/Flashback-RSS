@@ -30,11 +30,11 @@ items = ""
 for item in data:
 	items += """
 	<item>
-		<title>{{title}}</title>
-		<link>{{link}}</link>
-		<description>{{desc}}</description>
+		<title>{}</title>
+		<link>{}</link>
+		<description>{}</description>
 	</item>
-	""".replace("{{title}}", item[0]).replace("{{link}}", item[1]).replace("{{desc}}", item[2])
+	""".format(item[0], item[1], item[2])
 
 end_result = """<?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0">

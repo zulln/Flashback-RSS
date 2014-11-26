@@ -8,21 +8,24 @@ if r.status_code != 200:
 
 data = []
 
-nyheter_data = re.search(r'\<a name\=\"nyheter\"\>\<\/a\>(.+?)\<\/table\>', r.text, re.DOTALL)
-ovriga_data = re.search(r'\<a name\=\"ovriga\"\>\<\/a\>(.+?)\<\/table\>', r.text, re.DOTALL)
+nyheter_data = re.search(r'\<a name\=\"nyheter\"\>\<\/a\>(.+?)\<\/table\>', r.text, re.DOTALL).group(0).encode("utf-8")
+ovriga_data = re.search(r'\<a name\=\"ovriga\"\>\<\/a\>(.+?)\<\/table\>', r.text, re.DOTALL).group(0).encode("utf-8")
 
-nyheter_data = re.findall(r'\<tr\>(.+?)\<\/tr\>', nyheter_data.group(0), re.DOTALL)
-ovrig_data = re.findall(r'\<tr\>(.+?)\<\/tr\>', ovriga_data.group(0), re.DOTALL)
+nyheter_data = re.findall(r'\<tr\>(.+?)\<\/tr\>', nyheter_data, re.DOTALL)
+ovrig_data = re.findall(r'\<tr\>(.+?)\<\/tr\>', ovriga_data, re.DOTALL)
 
 for i in [nyheter_data, ovrig_data]:
 	y = False
 	for x in i:
 		if y:
-			b = re.search(r'id\=\"thread\_title\_(.+?)\<\/a\>', x).group(1)
-			title = b.split('">')[1]
-			link = "https://flashback.org/t"+b.split('">')[0]
-			desc = ""
-			data.append([title, link, desc])
+			a = re.search(r'id\=\"thread\_title\_(.+?)\<\/a\>', x).group(1)
+			b = re.search(r'<a class="gentle2 forum_title" href="/f(.+?)</a>', x).group(1)
+			title = a.split('">')[1]
+			link = "https://flashback.org/t"+a.split('">')[0]
+
+			category_url = b.split('">')[0]
+			category = b.split('">')[1].split('</')[0]
+			data.append([title, link, category_url, category])
 		else:
 			y = True
 
@@ -32,9 +35,9 @@ for item in data:
 	<item>
 		<title>{}</title>
 		<link>{}</link>
-		<description>{}</description>
+		<catergory domain="https://www.flashback.org/f{}">{}</category>
 	</item>
-	""".format(item[0], item[1], item[2])
+	""".format(item[0], item[1], item[2], item[3])
 
 end_result = """<?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0">
@@ -43,7 +46,7 @@ end_result = """<?xml version="1.0" encoding="UTF-8" ?>
 	<title>Flashback - Aktuella ämen</title>
 	<link>https://flashback.org/aktuella-amnen</link>
 	<description>Yttrandesfrihet på riktigt</description>
-""" + items.encode("utf-8") + """
+""" + items + """
 </channel>
 
 </rss>"""

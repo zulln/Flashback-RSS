@@ -35,7 +35,7 @@ for item in data:
 	<item>
 		<title>{}</title>
 		<link>{}</link>
-		<catergory domain="https://www.flashback.org/f{}">{}</category>
+		<category domain="https://www.flashback.org/f{}">{}</category>
 	</item>
 	""".format(item[0], item[1], item[2], item[3])
 

@@ -6,28 +6,23 @@ r = requests.get('https://flashback.org/aktuella-amnen')
 if r.status_code != 200:
 	exit('Flashback fucked up.')
 
-data = []
-
 nyheter_data = re.search(r'\<a name\=\"nyheter\"\>\<\/a\>(.+?)\<\/table\>', r.text, re.DOTALL).group(0).encode("utf-8")
 ovriga_data = re.search(r'\<a name\=\"ovriga\"\>\<\/a\>(.+?)\<\/table\>', r.text, re.DOTALL).group(0).encode("utf-8")
 
 nyheter_data = re.findall(r'\<tr\>(.+?)\<\/tr\>', nyheter_data, re.DOTALL)
 ovrig_data = re.findall(r'\<tr\>(.+?)\<\/tr\>', ovriga_data, re.DOTALL)
 
-for i in [nyheter_data, ovrig_data]:
-	y = False
+data = []
+for i in [nyheter_data[1:], ovrig_data[1:]]:
 	for x in i:
-		if y:
-			a = re.search(r'id\=\"thread\_title\_(.+?)\<\/a\>', x).group(1)
-			b = re.search(r'<a class="gentle2 forum_title" href="/f(.+?)</a>', x).group(1)
-			title = a.split('">')[1]
-			link = "https://flashback.org/t"+a.split('">')[0]
+		a = re.search(r'id\=\"thread\_title\_(.+?)\<\/a\>', x).group(1)
+		b = re.search(r'<a class="gentle2 forum_title" href="/f(.+?)</a>', x).group(1)
+		title = a.split('">')[1]
+		link = "https://flashback.org/t"+a.split('">')[0]
 
-			category_url = b.split('">')[0]
-			category = b.split('">')[1].split('</')[0]
-			data.append([title, link, category_url, category])
-		else:
-			y = True
+		category_url = b.split('">')[0]
+		category = b.split('">')[1].split('</')[0]
+		data.append([title, link, category_url, category])
 
 items = ""
 for item in data:
